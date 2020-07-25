@@ -185,7 +185,7 @@ model_simple = simple_model()
 model_simple.summary()
 
 #Checkpoint callback usage
-checkpoint_path = ('C:\\Users\\sebas\\Desktop\\Project Telespazio\\Saved_Model\\Checkpoints')
+checkpoint_path = ('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Saved_Model\\Checkpoints')
 checkpoint_dir = os.path.dirname(checkpoint_path)
 
 # Create a callback that saves the model's weights
