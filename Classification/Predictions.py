@@ -9,7 +9,12 @@ def predict_one_image(img, model):
     class_num = np.argmax(pred)
     return class_num, np.max(pred)
 
-test_img = cv2.imread('D:\\Datasets\\Predictions images\\SUNFLOW.jpg')
+def resize_test_image(img):
+    return cv2.resize(img.copy(), (IMG_WIDTH, IMG_HEIGHT))
+
+#Predict for simple model    
+test_img = cv2.imread('D:\\Datasets\\Predictions images\\SUN.jpg')
+resize_test_image(test_img)
 pred, probability = predict_one_image(test_img, model_simple)
 print('%s %d%%' % (labels[pred], round(probability, 2) * 100))
 _, ax = plt.subplots(1)
@@ -17,10 +22,27 @@ plt.imshow(convertToRGB(test_img))
 # Turn off tick labels
 ax.set_yticklabels([])
 ax.set_xticklabels([])
-plt.grid('off')
+plt.tight_layout()
 plt.show()
 
-#Saving the model
-saved_model_path = 'C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Saved_Model'
+#Predict for MobilNetV2 model  
+test_img = cv2.imread('D:\\Datasets\\Predictions images\\SUN.jpg')
+resize_test_image(test_img)
+pred, probability = predict_one_image(test_img, MobileNet)
+print('%s %d%%' % (labels[pred], round(probability, 2) * 100))
+_, ax = plt.subplots(1)
+plt.imshow(convertToRGB(test_img))
+# Turn off tick labels
+ax.set_yticklabels([])
+ax.set_xticklabels([])
+plt.tight_layout()
+plt.show()
+
+#Saving the models
+saved_model_path = 'C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\Simple_Model'
 tf.saved_model.save(model_simple, saved_model_path)
-model_simple.save_weights('D:\\Datasets\\Weights')
+model_simple.save_weights('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\Simple_Model\\Weights')
+
+saved_model_path = 'C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\MobilNetV2'
+tf.saved_model.save(MobileNet, saved_model_path)
+MobileNet.save_weights('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\MobilNetV2\\Weights')

@@ -24,6 +24,7 @@ datagen = ImageDataGenerator(
 datagen.fit(train_images)
 
 #Training process
+
 #Simple model case
 start = time.time()
 Simple_model_info = model_simple.fit_generator(datagen.flow(train_images,train_labels, batch_size=batch_size),
@@ -87,4 +88,4 @@ test_loss, test_acc = model_simple.evaluate(test_images, test_labels)
 print('\nTest accuracy for simple model:\n', test_acc)
 
 test_loss, test_acc = MobileNet.evaluate(test_images, test_labels)
-print('Test accuracy for ModelNetV2 model:\n', test_acc)
+print('\nTest accuracy for ModelNetV2 model:\n', test_acc)
