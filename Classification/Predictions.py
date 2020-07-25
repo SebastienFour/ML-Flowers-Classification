@@ -37,12 +37,3 @@ ax.set_yticklabels([])
 ax.set_xticklabels([])
 plt.tight_layout()
 plt.show()
-
-#Saving the models
-saved_model_path = 'C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\Simple_Model'
-tf.saved_model.save(model_simple, saved_model_path)
-model_simple.save_weights('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\Simple_Model\\Weights')
-
-saved_model_path = 'C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\MobilNetV2'
-tf.saved_model.save(MobileNet, saved_model_path)
-MobileNet.save_weights('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\MobilNetV2\\Weights')

@@ -89,3 +89,12 @@ print('\nTest accuracy for simple model:\n', test_acc)
 
 test_loss, test_acc = MobileNet.evaluate(test_images, test_labels)
 print('\nTest accuracy for ModelNetV2 model:\n', test_acc)
+
+#Saving the models
+saved_model_path1 = 'C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\Simple_Model'
+tf.saved_model.save(model_simple, saved_model_path1)
+model_simple.save_weights('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\Simple_Model\\Weights')
+
+saved_model_path2 = 'C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\MobilNetV2'
+tf.saved_model.save(MobileNet, saved_model_path2)
+MobileNet.save_weights('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\MobilNetV2\\Weights')
