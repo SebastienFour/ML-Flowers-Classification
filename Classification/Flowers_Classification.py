@@ -28,6 +28,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam,SGD,Adagrad,Adadelta,RMSprop
 from keras.utils import to_categorical
+from tensorflow.python.keras.applications.mobilenet_v2 import MobileNetV2
 
 # specifically for manipulating zipped images and getting numpy arrays of pixel values of images.
 from cv2 import cv2              
@@ -82,7 +83,7 @@ def show_random_images():
             ax[i,j].imshow(IMG_ARRAY_DICT[l])
             ax[i,j].set_title(LABEL_DICT[l])
 
-    fig.suptitle('Random BGR flowers', fontsize=16)
+    fig.suptitle('Random RGB flowers', fontsize=16)
     plt.tight_layout()
     plt.show()
 
@@ -145,7 +146,7 @@ IMG_ARRAY_DICT = np.array(IMG_ARRAY_DICT)
 IMG_ARRAY_DICT = IMG_ARRAY_DICT/255
 
 #Splitting data in training set and validation set
-x_train, x_test, y_train, y_test = train_test_split(IMG_ARRAY_DICT, Y, test_size=0.25, random_state=42)
+train_images, test_images, train_labels, test_labels = train_test_split(IMG_ARRAY_DICT, Y, test_size=0.25, random_state=42)
 
 #Setting random seeds
 np.random.seed(42)
@@ -171,7 +172,7 @@ def simple_model():
     model.add(Flatten())
     model.add(Dense(512))
     model.add(Activation('relu'))
-    model.add(Dense(5, activation = "softmax"))
+    model.add(Dense(len(labels), activation = "softmax"))
     
     #Compiling the model
     opt = tf.keras.optimizers.Adam(1e-4)
@@ -180,15 +181,47 @@ def simple_model():
 
     return model
 
+def pre_trained_model():
+    print("Building model with", "MobileNetV2")
+    model = Sequential()
+
+    model.add(MobileNetV2(include_top=False, pooling='avg', weights="imagenet"))
+    model.add(Flatten())
+    model.add(BatchNormalization())
+    model.add(Dense(2048, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Dense(1024, activation='relu'))
+    model.add(BatchNormalization())
+    model.add(Dense(len(labels), activation='softmax'))
+
+    model.layers[0].trainable = False
+    
+    opt = tf.keras.optimizers.Adam(1e-4)
+    opt = tf.train.experimental.enable_mixed_precision_graph_rewrite(opt)
+    model.compile(optimizer=opt,loss='categorical_crossentropy',metrics=['acc'])
+    
+    return model
+    
 #Models summaries
+print("Simple Model Summary :")
 model_simple = simple_model()
 model_simple.summary()
+print("\nMobileNetV2 Summary :")
+MobileNet = pre_trained_model()
+MobileNet.summary()
 
-#Checkpoint callback usage
-checkpoint_path = ('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Saved_Model\\Checkpoints')
-checkpoint_dir = os.path.dirname(checkpoint_path)
+#Checkpoints callback usage
+checkpoint_path_simple = ('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\Simple_Model')
+checkpoint_dir_simple = os.path.dirname(checkpoint_path_simple)
+
+checkpoint_path__mobilenet = ('C:\\Users\\sebas\\Desktop\\Project_Telespazio\\Final Code\\Saved_Models\\MobileNetV2')
+checkpoint_dir_mobilenet = os.path.dirname(checkpoint_path_simple)
 
 # Create a callback that saves the model's weights
-cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path,
+cp_callback_simple_model = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path_simple,
+                                                 save_weights_only=True,
+                                                 verbose=1, period=5)
+
+cp_callback_mobileNetV2 = tf.keras.callbacks.ModelCheckpoint(filepath=checkpoint_path__mobilenet,
                                                  save_weights_only=True,
                                                  verbose=1, period=5)

@@ -1,10 +1,11 @@
 import time
-from Flowers_Classification import model_simple, x_train, y_train, x_test, y_test, plt, np, cp_callback, tf, simple_model, IMG_WIDTH, IMG_HEIGHT
+from Flowers_Classification import *
 from tensorflow.python.keras.preprocessing.image import ImageDataGenerator
 
 #Preparing input data
 batch_size = 32
-epochs = 20
+epochs1 = 20
+epochs2 = 10
 
 #Preventing overfitting via data augmentation
 datagen = ImageDataGenerator(
@@ -20,14 +21,14 @@ datagen = ImageDataGenerator(
         horizontal_flip=True,  # randomly flip images
         vertical_flip=False)  # randomly flip images
 
-datagen.fit(x_train)
+datagen.fit(train_images)
 
 #Training process
 #Simple model case
 start = time.time()
-Simple_model_info = model_simple.fit_generator(datagen.flow(x_train,y_train, batch_size=batch_size),
-                              epochs = epochs, validation_data = (x_test,y_test),
-                              verbose = 1, steps_per_epoch=x_train.shape[0] // batch_size, callbacks=[cp_callback])
+Simple_model_info = model_simple.fit_generator(datagen.flow(train_images,train_labels, batch_size=batch_size),
+                              epochs = epochs1, validation_data = (test_images,test_labels),
+                              verbose = 2, steps_per_epoch=train_images.shape[0] // batch_size, callbacks=[cp_callback_simple_model])
 
 #Showing results for simple model
 plt.plot(Simple_model_info.history['loss'])
@@ -48,12 +49,42 @@ plt.show()
 
 end = time.time()
 duration = end - start
-print ('\n simple_model took %0.2f seconds (%0.1f minutes) to train for %d epochs'%(duration, duration/60, epochs), "\n")
+print ('\n simple_model took %0.2f seconds (%0.1f minutes) to train for %d epochs'%(duration, duration/60, epochs1), "\n")
+
+#MobileNetV2 Model
+start = time.time()
+MobileNet_model_Info = MobileNet.fit_generator(datagen.flow(train_images,train_labels, batch_size=batch_size),
+                              epochs = epochs2, validation_data = (test_images,test_labels),
+                              verbose = 2, steps_per_epoch=train_images.shape[0] // batch_size, callbacks=[cp_callback_mobileNetV2])
+
+#Showing results for MobileNetV2 model
+plt.plot(MobileNet_model_Info.history['loss'])
+plt.plot(MobileNet_model_Info.history['val_loss'])
+plt.title('Model Loss')
+plt.ylabel('Loss')
+plt.xlabel('Epochs')
+plt.legend(['train', 'test'])
+plt.show()
+
+plt.plot(MobileNet_model_Info.history['acc'])
+plt.plot(MobileNet_model_Info.history['val_acc'])
+plt.title('Model Accuracy')
+plt.ylabel('Accuracy')
+plt.xlabel('Epochs')
+plt.legend(['train', 'test'])
+plt.show()
+
+end = time.time()
+duration = end - start
+print ('\n MobileNetV2 model took %0.2f seconds (%0.1f minutes) to train for %d epochs'%(duration, duration/60, epochs2), "\n")
 
 def return_name(label_arr):
     idx = np.where(label_arr == 1)
     return idx[0][0]
 
 #Testing true accuracy
-test_loss, test_acc = model_simple.evaluate(x_test, y_test)
-print('Test accuracy:', test_acc)
+test_loss, test_acc = model_simple.evaluate(test_images, test_labels)
+print('\nTest accuracy for simple model:\n', test_acc)
+
+test_loss, test_acc = MobileNet.evaluate(test_images, test_labels)
+print('Test accuracy for ModelNetV2 model:\n', test_acc)
